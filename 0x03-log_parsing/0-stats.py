@@ -60,5 +60,4 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, EOFError):
         print_stats()
     finally:
-        if line_count % 10 != 0:
-            print_stats()
+        print_stats()
