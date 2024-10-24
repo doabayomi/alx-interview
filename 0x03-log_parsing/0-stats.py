@@ -2,7 +2,7 @@
 """Printing stats from log"""
 import re
 import sys
-import signal
+# import signal
 
 stats = {
     'File size': 0,
@@ -26,47 +26,49 @@ def print_stats():
         print(f"{code}: {stats[int(code)]}")
 
 
-def handle_signal(signum, frame):
-    """Handler for keyboard interrupt to print stats on logs
+# def handle_signal(signum, frame):
+#     """Handler for keyboard interrupt to print stats on logs
 
-    Args:
-        signum: Default signum
-        frame: Default frame
-    """
+#     Args:
+#         signum: Default signum
+#         frame: Default frame
+#     """
+#     print_stats()
+#     sys.exit(0)
+
+
+# signal.signal(signal.SIGINT, handle_signal)
+if __name__ == '__main__':
+    line_count = 0
+    """Log line pattern"""
+    pattern = (
+        r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} "
+        r"\- "
+        r"\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] "
+        r"\"GET /projects/260 HTTP/1\.1\" "
+        r"(\d{3}) "
+        r"(\d+)$"
+    )
+
+    try:
+        for line in sys.stdin:
+            line_count += 1
+
+            match = re.match(pattern, line)
+            if match is None:
+                continue
+
+            status_code = int(match.group(1))
+            file_size = int(match.group(2))
+            # print(f"{file_size}, {status_code}")
+
+            stats["File size"] += file_size
+            if status_code in stats:
+                stats[status_code] += 1
+
+            if line_count % 10 == 0:
+                print_stats()
+    except KeyboardInterrupt:
+        print_stats()
+
     print_stats()
-
-    sys.exit(0)
-
-
-signal.signal(signal.SIGINT, handle_signal)
-line_count = 0
-
-"""Log line pattern"""
-pattern = (
-    r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} "
-    r"\- "
-    r"\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] "
-    r"\"GET /projects/260 HTTP/1\.1\" "
-    r"(\d{3}) "
-    r"(\d+)$"
-)
-
-
-if __name__ == "__main__":
-    for line in sys.stdin:
-        line_count += 1
-
-        match = re.match(pattern, line)
-        if match is None:
-            continue
-
-        status_code = int(match.group(1))
-        file_size = int(match.group(2))
-        # print(f"{file_size}, {status_code}")
-
-        stats["File size"] += file_size
-        if status_code in stats:
-            stats[status_code] += 1
-
-        if line_count % 10 == 0:
-            print_stats()
