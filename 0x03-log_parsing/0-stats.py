@@ -22,7 +22,8 @@ def print_stats():
     print(f"File size: {stats['File size']}")
     codes = list(stats.keys())[1:]
     for code in sorted(codes):
-        print(f"{code}: {stats[code]}")
+        if stats[code] > 0:
+            print(f"{code}: {stats[code]}")
 
 
 if __name__ == '__main__':
@@ -39,6 +40,7 @@ if __name__ == '__main__':
 
     try:
         for line in sys.stdin:
+            line = line.strip()
             line_count += 1
 
             match = re.match(pattern, line)
