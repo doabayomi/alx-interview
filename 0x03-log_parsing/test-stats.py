@@ -34,7 +34,6 @@ def handle_signal(signum, frame):
         frame: Default frame
     """
     print_stats()
-
     sys.exit(0)
 
 
@@ -51,8 +50,7 @@ pattern = (
     r"(\d+)$"
 )
 
-
-if __name__ == "__main__":
+try:
     for line in sys.stdin:
         line_count += 1
 
@@ -70,3 +68,5 @@ if __name__ == "__main__":
 
         if line_count % 10 == 0:
             print_stats()
+except KeyboardInterrupt:
+    print_stats()
