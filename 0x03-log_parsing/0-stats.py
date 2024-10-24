@@ -2,7 +2,6 @@
 """Printing stats from log"""
 import re
 import sys
-# import signal
 
 stats = {
     'File size': 0,
@@ -23,21 +22,9 @@ def print_stats():
     print(f"File size: {stats['File size']}")
     codes = list(stats.keys())[1:]
     for code in sorted(codes):
-        print(f"{code}: {stats[int(code)]}")
+        print(f"{code}: {stats[code]}")
 
 
-# def handle_signal(signum, frame):
-#     """Handler for keyboard interrupt to print stats on logs
-
-#     Args:
-#         signum: Default signum
-#         frame: Default frame
-#     """
-#     print_stats()
-#     sys.exit(0)
-
-
-# signal.signal(signal.SIGINT, handle_signal)
 if __name__ == '__main__':
     line_count = 0
     """Log line pattern"""
@@ -45,7 +32,7 @@ if __name__ == '__main__':
         r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} "
         r"\- "
         r"\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] "
-        r"\"GET /projects/260 HTTP/1\.1\" "
+        r"\"[A-Z]+ /.* HTTP/1\.1\" "
         r"(\d{3}) "
         r"(\d+)$"
     )
@@ -68,7 +55,7 @@ if __name__ == '__main__':
 
             if line_count % 10 == 0:
                 print_stats()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         print_stats()
-
-    print_stats()
+    finally:
+        print_stats()
