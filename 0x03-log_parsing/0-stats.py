@@ -70,4 +70,3 @@ try:
             print_stats()
 except KeyboardInterrupt:
     print_stats()
-
