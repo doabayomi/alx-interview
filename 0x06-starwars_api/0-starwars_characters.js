@@ -1,6 +1,7 @@
 #!/usr/bin/node
 /* eslint-disable no-console */
-const request = require('request');
+const util = require('util');
+const request = util.promisify(require('request'));
 
 const movieId = Number(process.argv[2]);
 
