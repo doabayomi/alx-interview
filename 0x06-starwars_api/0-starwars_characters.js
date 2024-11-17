@@ -1,6 +1,7 @@
 #!/usr/bin/node
 /* eslint-disable no-console */
-// const fetch = require('node-fetch');
+// eslint-disable-next-line import/no-unresolved
+const fetch = require('node-fetch');
 
 const movieId = Number(process.argv[2]);
 
