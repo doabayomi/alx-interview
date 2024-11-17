@@ -1,21 +1,34 @@
 #!/usr/bin/node
-const util = require('util');
-const request = util.promisify(require('request'));
+/* eslint-disable no-console */
+const axios = require('axios');
 
-const API_URL = 'https://swapi-api.hbtn.io/api';
+const movieId = Number(process.argv[2]);
 
-async function starwarsCharacters() {
-  const endpoint = `${API_URL}/films/${process.argv[2]}/`;
-  let response = await (await request(endpoint)).body;
-  response = JSON.parse(response);
-  const {characters} = response;
-
-  for (let i = 0; i < characters.length; i++) {
-    const urlCharacter = characters[i];
-    let character = await (await request(urlCharacter)).body;
-    character = JSON.parse(character);
-    console.log(character.name);
+async function getCharacterName(characterUrl) {
+  try {
+    const response = await axios.get(characterUrl);
+    return response.data.name;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
   }
 }
 
-starwarsCharacters();
+(async function fetchAndPrintCharacters() {
+  try {
+    const response = await axios.get(`https://swapi-api.alx-tools.com/api/films/${movieId}`);
+    const characterUrls = Array.from(response.data.characters);
+
+    // Use `Promise.all` to resolve all Promises concurrently
+    const characterNames = await Promise.all(
+      characterUrls.map((link) => getCharacterName(link)),
+    );
+
+    // Print character names
+    characterNames.forEach((character) => {
+      console.log(character);
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}());
