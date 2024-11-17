@@ -1,36 +1,52 @@
 #!/usr/bin/node
 /* eslint-disable no-console */
-// eslint-disable-next-line import/no-unresolved
-const fetch = require('node-fetch');
+const request = require('request');
 
 const movieId = Number(process.argv[2]);
 
-async function getCharacterName(characterUrl) {
-  try {
-    const response = await fetch(characterUrl);
-    const data = await response.json();
-    return data.name;
-  } catch (error) {
-    console.error('Error:', error);
-    return null;
-  }
+function getCharacterName(characterUrl, callback) {
+  request(characterUrl, (error, response, body) => {
+    if (error) {
+      console.error('Error:', error);
+      callback(null);
+    } else {
+      const data = JSON.parse(body);
+      callback(data.name);
+    }
+  });
 }
 
-(async function fetchAndPrintCharacters() {
-  try {
-    const url = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
-    const response = await fetch(url);
-    const data = await response.json();
+function fetchAndPrintCharacters() {
+  const url = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
+  request(url, (error, response, body) => {
+    if (error) {
+      console.error('Error:', error);
+      return;
+    }
+
+    const data = JSON.parse(body);
     const characterUrls = Array.from(data.characters);
 
-    const characterNames = await Promise.all(
-      characterUrls.map((link) => getCharacterName(link)),
-    );
+    let completedRequests = 0;
+    const characterNames = [];
 
-    characterNames.forEach((character) => {
-      console.log(character);
+    characterUrls.forEach((link, index) => {
+      getCharacterName(link, (name) => {
+        if (name) {
+          characterNames[index] = name;
+        }
+        // eslint-disable-next-line no-plusplus
+        completedRequests++;
+
+        if (completedRequests === characterUrls.length) {
+          // Print character names in the order of the original requests
+          characterNames.forEach((character) => {
+            console.log(character);
+          });
+        }
+      });
     });
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}());
+  });
+}
+
+fetchAndPrintCharacters();
