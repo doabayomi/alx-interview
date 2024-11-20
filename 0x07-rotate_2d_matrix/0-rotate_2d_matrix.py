@@ -1,10 +1,9 @@
 #!/usr/bin/python3
 """Clockwise Matrix Rotation
 """
-from typing import List, Any
 
 
-def rotate_2d_matrix(matrix: List[List[Any]]) -> None:
+def rotate_2d_matrix(matrix):
     """Rotates a n x n 2D matrix clockwise
 
     Args:
